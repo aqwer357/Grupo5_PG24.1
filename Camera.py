@@ -15,7 +15,7 @@ def cross(v1: Vector, v2: Vector):
     return product
 
 class Camera:
-    def __init__(self, pos: Point, target: Point, up: Vector):
+    def __init__(self, pos: Point, target: Point, up: Vector, dist, hScreen, wScreen):
         self.pos = pos
         self.target = target
     
@@ -23,6 +23,10 @@ class Camera:
         self.w = pointSubtract(pos, target)
         self.u = cross(self.w, up)
         self.up = up
+
+        self.dist = dist
+        self.hScreen = hScreen
+        self.wScreen = wScreen
 
     def __repr__(self):  # __repr__ is used for debugging
         return f"Camera({self.pos}, {self.target}, {self.up})"
