@@ -20,9 +20,9 @@ class Camera:
         self.target = target
     
         # Vectors of R3
-        self.w = pointSubtract(pos, target)
-        self.u = cross(self.w, up)
-        self.up = up
+        self.w = pointSubtract(pos, target).getNormalized()
+        self.u = cross(self.w, up).getNormalized()
+        self.up = up.getNormalized()
 
         self.dist = dist
         self.hScreen = hScreen
