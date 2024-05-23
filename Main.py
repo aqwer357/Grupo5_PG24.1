@@ -18,37 +18,14 @@ def main():
     camera = Camera(Point(0, 0, 0), Point(0, 0, -5), Vector(0, 1, 0), 1.0, height, width)
     
     sphere = Sphere(Point(0, 0, -10), 3, Vector(1, 0, 0))  # Red sphere
-    plane = Plane(Point(0, -3, -10), Vector(0, 1, 0), (0, 1, 0))  # Green plane
+    plane = Plane(Point(0, -3, -10), Vector(0, 1, 0), Vector(0, 1, 0))  # Green plane
 
-    image = [[(0, 0, 0) for _ in range(width)] for _ in range(height)]
+    objects = []
 
-    intersects_sphere = False
-    intersects_plane = False
+    objects.append(sphere)
+    objects.append(plane)
 
-    for i in range(height):
-        for j in range(width):
-            x = (2 * (j + 0.5) / width - 1) * (width / height)
-            y = 1 - 2 * (i + 0.5) / height
-            ray = Ray(camera.pos, Vector(x, y, -1))
-
-            sphere_intersection = sphere.intersect(ray.origin, ray.direction)
-            if sphere_intersection:
-                image[i][j] = (100, 0, 0) #vermelho
-                intersects_sphere = True
-            else:
-                plane_intersection = plane.intersect(ray.origin, ray.direction)
-                if plane_intersection:
-                    image[i][j] = (0, 255, 0) #verde
-                    intersects_plane = True
-
-    if intersects_plane and intersects_sphere:
-        print("O raio intercepta o plano e a esfera.")
-    elif intersects_plane:
-        print("O raio intercepta o plano.")
-    elif intersects_sphere:
-        print("O raio intercepta a esfera.")
-    else:
-        print("O raio não intercepta nem a esfera nem o plano.")
+    image = camera.raycast(objects)
 
     write_ppm(image, width, height, "output.ppm")
     print("Image written to output.ppm")

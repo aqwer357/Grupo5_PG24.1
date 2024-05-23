@@ -44,6 +44,11 @@ class Sphere:
     def __repr__(self):
         return f"Sphere({self.center}, {self.radius}, {self.colorRGB})"
 
+    class IntersectOutput:
+        def __init__(self, intersectPoint: Point, t):
+            self.intersectPoint = intersectPoint
+            self.t = t
+
     def intersect(self, origin: Point, direction: Vector):
         oc = point_subtract(origin, self.center)
         a = direction.x**2 + direction.y**2 + direction.z**2
@@ -52,15 +57,19 @@ class Sphere:
         discriminant = b**2 - 4 * a * c
 
         if discriminant < 0:
+            # if discriminant < 0 -> no intersection
             return None
         else:
+            # we choose negative in quadratic formula to choose the first point of intersection with the sphere
             t = (-b - discriminant**0.5) / (2.0 * a)
             if t >= 0:
-                intersect_point = Point(origin.x + t * direction.x,
-                                        origin.y + t * direction.y,
-                                        origin.z + t * direction.z)
+                intersect_point = self.IntersectOutput(Point(origin.x + t * direction.x,
+                                                             origin.y + t * direction.y,
+                                                             origin.z + t * direction.z),
+                                                             t)
                 return intersect_point
             else:
+                # t <= 0 --> object is behind camera
                 return None
 
 
@@ -73,15 +82,21 @@ class Plane:
     def __repr__(self):
         return f"Plane({self.point}, {self.normal}, {self.colorRGB})"
 
+    class IntersectOutput:
+        def __init__(self, intersectPoint: Point, t):
+            self.intersectPoint = intersectPoint
+            self.t = t
+
     def intersect(self, origin: Point, direction: Vector):
         denom = self.normal.x * direction.x + self.normal.y * direction.y + self.normal.z * direction.z
         if denom != 0:
             diff = point_subtract(self.point, origin)
             t = (diff.x * self.normal.x + diff.y * self.normal.y + diff.z * self.normal.z) / denom
             if t >= 0:
-                intersect_point = Point(origin.x + t * direction.x,
-                                        origin.y + t * direction.y,
-                                        origin.z + t * direction.z)
+                intersect_point = self.IntersectOutput(Point(origin.x + t * direction.x,
+                                                             origin.y + t * direction.y,
+                                                             origin.z + t * direction.z),
+                                                             t)
                 return intersect_point
         return None
     
