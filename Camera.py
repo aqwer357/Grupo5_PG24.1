@@ -42,10 +42,19 @@ class Camera:
                 for obj in objects:
                     intersection = obj.intersect(ray.origin, ray.direction)
 
-                    if intersection is not None and intersection.t < closestT:
-                        closestT = intersection.t
-                        color = obj.colorRGB
-                        # *255 is used to convert values to regular RGB notation
-                        image[i][j] = (color.x * 255, color.y * 255, color.z * 255)
+                    if intersection is not None:
+                        if obj.__class__.__name__ == 'TriMesh':
+                                for intersect in intersection:
+                                    # TriMesh returns intersection list and this for parses them
+                                    if intersect.t < closestT:
+                                        closestT = intersect.t
+                                        color = obj.colorRGB
+                                        # *255 is used to convert values to regular RGB notation
+                                        image[i][j] = (color.x * 255, color.y * 255, color.z * 255)
+                        elif intersection.t < closestT:
+                            closestT = intersection.t
+                            color = obj.colorRGB
+                            # *255 is used to convert values to regular RGB notation
+                            image[i][j] = (color.x * 255, color.y * 255, color.z * 255)
 
         return image
