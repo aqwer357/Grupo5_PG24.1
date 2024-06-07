@@ -58,7 +58,7 @@ def rotate_z(angle):
 
 # WIP, actual calculation of matrix * vector/point
 def dotProd_matrixTuple(matrix, pointOrVector):
-    x=0
-    y=0
-    z=0
-    return [x,y,z]
+    pointOrVector.x = matrix[0][0] * pointOrVector.x + matrix[0][1] * pointOrVector.y + matrix[0][2] * pointOrVector.z + matrix[0][3]
+    pointOrVector.y = matrix[1][0] * pointOrVector.x + matrix[1][1] * pointOrVector.y + matrix[1][2] * pointOrVector.z + matrix[1][3]
+    pointOrVector.z = matrix[2][0] * pointOrVector.x + matrix[2][1] * pointOrVector.y + matrix[2][2] * pointOrVector.z + matrix[2][3]
+    return pointOrVector
