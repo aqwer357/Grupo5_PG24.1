@@ -1,5 +1,6 @@
 from Elements import Point, Vector, Sphere, Plane, TriMesh, cross, point_subtract
 from Camera import Camera
+from Transforms import affine_transform
 
 def write_ppm(image, width, height, filename):
     with open(filename, 'w') as f:
@@ -16,11 +17,17 @@ def write_ppm(image, width, height, filename):
 def main():
     width, height = 800, 600
 
-    p0 = Point(10, 6, -8)
-    p1 = Point(0, 5, -8)
-    p2 = Point(-10, 2, -8)
-    p3 = Point(0, -1, -6)
+    p0 = Point(-5, 3, -10)
+    p1 = Point(5, 3, -10)
+    p2 = Point(-5, -3, -10)
+    p3 = Point(5, -3, -10)
     p4 = Point(20, 2, -10)
+
+    # p0 = affine_transform(p0, "rotate_z", 0, 0, 0, 45)
+    # p1 = affine_transform(p1, "rotate_z", 0, 0, 0, 45)
+    # p2 = affine_transform(p2, "rotate_z", 0, 0, 0, 45)
+    # p3 = affine_transform(p3, "rotate_z", 0, 0, 0, 45)
+    # p4 = affine_transform(p4, "rotate_z", 0, 0, 0, 45)
 
     n1 = cross(point_subtract(p1, p0), point_subtract(p4, p0))
     n1 = n1.get_normalized()
@@ -39,18 +46,18 @@ def main():
     sphere = Sphere(Point(0, 0, -10), 3, Vector(1, 0, 0))  # Red sphere
     plane = Plane(Point(0, -2, -10), Vector(0, 1, 0), Vector(0, 1, 0))  # Green plane
 
-    mesh = TriMesh(4, 
-                   5, 
-                   [p0, p1, p2, p3, p4], 
-                   [(0,1,4),(1,2,4),(2,3,4),(0,3,4)],
-                   [n1,n2,n3,n4],
+    mesh = TriMesh(2, 
+                   4, 
+                   [p0, p1, p2, p3], 
+                   [(0,1,2), (3,1,2)],
+                   [n1, n2],
                    [],
                    Vector(0,0,1)) # Blue mesh
 
     objects = []
 
-    objects.append(sphere)
-    objects.append(plane)
+    #objects.append(sphere)
+    #objects.append(plane)
     objects.append(mesh)
 
     image = camera.raycast(objects)
