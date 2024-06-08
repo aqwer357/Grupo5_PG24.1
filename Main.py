@@ -17,17 +17,16 @@ def write_ppm(image, width, height, filename):
 def main():
     width, height = 800, 600
 
-    p0 = Point(-5, 3, -10)
-    p1 = Point(5, 3, -10)
-    p2 = Point(-5, -3, -10)
-    p3 = Point(5, -3, -10)
+    p0 = Point(-3, 3, -10)
+    p1 = Point(3, 3, -10)
+    p2 = Point(-3, -3, -10)
+    p3 = Point(3, -3, -10)
     p4 = Point(20, 2, -10)
 
-    # p0 = affine_transform(p0, "rotate_z", 0, 0, 0, 45)
-    # p1 = affine_transform(p1, "rotate_z", 0, 0, 0, 45)
-    # p2 = affine_transform(p2, "rotate_z", 0, 0, 0, 45)
-    # p3 = affine_transform(p3, "rotate_z", 0, 0, 0, 45)
-    # p4 = affine_transform(p4, "rotate_z", 0, 0, 0, 45)
+    p0 = affine_transform(p0, "rotate_z", 0, 0, 0, 45)
+    p1 = affine_transform(p1, "rotate_z", 0, 0, 0, 45)
+    p2 = affine_transform(p2, "rotate_z", 0, 0, 0, 45)
+    p3 = affine_transform(p3, "rotate_z", 0, 0, 0, 45)
 
     n1 = cross(point_subtract(p1, p0), point_subtract(p4, p0))
     n1 = n1.get_normalized()
