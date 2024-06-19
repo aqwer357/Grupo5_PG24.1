@@ -23,15 +23,15 @@ def main():
     p3 = Point(3, -3, -10)
     p4 = Point(20, 2, -10)
 
-    p0 = affine_transform(p0, "rotate_z", 0, 0, 0, 45)
-    p1 = affine_transform(p1, "rotate_z", 0, 0, 0, 45)
-    p2 = affine_transform(p2, "rotate_z", 0, 0, 0, 45)
-    p3 = affine_transform(p3, "rotate_z", 0, 0, 0, 45)
+    p0 = affine_transform(p0, "rotate_x", 0, 0, 2, 45)
+    p1 = affine_transform(p1, "rotate_x", 0, 0, 2, 45)
+    p2 = affine_transform(p2, "rotate_x", 0, 0, 2, 45)
+    p3 = affine_transform(p3, "rotate_x", 0, 0, 2, 45)
 
-    n1 = cross(point_subtract(p1, p0), point_subtract(p4, p0))
+    n1 = cross(point_subtract(p1, p0), point_subtract(p2, p0))
     n1 = n1.get_normalized()
 
-    n2 = cross(point_subtract(p2, p1), point_subtract(p4, p1))
+    n2 = cross(point_subtract(p2, p1), point_subtract(p3, p1))
     n2 = n2.get_normalized()
 
     n3 = cross(point_subtract(p3, p2), point_subtract(p4, p2))
