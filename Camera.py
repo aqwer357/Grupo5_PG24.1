@@ -1,4 +1,5 @@
-from Elements import Point, Vector, point_subtract, cross
+from Elements import Point, Vector, IntersectOutput, point_subtract, cross
+from Phong import phong_model
 
 # defines camera and raycasting
 
@@ -14,7 +15,7 @@ class Ray:
         return f"Ray({self.origin}, {self.direction})"
 
 class Camera:
-    def __init__(self, pos: Point, target: Point, up: Vector, dist: float, hScreen: int, wScreen: int):
+    def __init__(self, pos: Point, target: Point, up: Vector, dist: float, hScreen: int, wScreen: int, lightSources):
         self.pos = pos
         self.target = target
         self.w = point_subtract(pos, target).get_normalized()
@@ -23,6 +24,7 @@ class Camera:
         self.dist = dist
         self.hScreen = hScreen
         self.wScreen = wScreen
+        self.lightSources = lightSources
 
     def __repr__(self):
         return f"Camera({self.pos}, {self.target}, {self.dist}, {self.hScreen}, {self.wScreen})"
@@ -48,13 +50,15 @@ class Camera:
                                     # TriMesh returns intersection list and this for parses them
                                     if intersect.t < closestT:
                                         closestT = intersect.t
-                                        color = obj.colorRGB
-                                        # *255 is used to convert values to regular RGB notation
-                                        image[i][j] = (color.x * 255, color.y * 255, color.z * 255)
+                                        color = phong_model(self.pos, intersect.intersectPoint, self.lightSources, intersect.normal,
+                                                             obj.k_ambient, obj.k_diffuse, obj.k_specular, obj.k_reflection, obj.k_transmission, obj.n_coef)
+
+                                        image[i][j] = (color.x, color.y, color.z)
                         elif intersection.t < closestT:
                             closestT = intersection.t
-                            color = obj.colorRGB
-                            # *255 is used to convert values to regular RGB notation
-                            image[i][j] = (color.x * 255, color.y * 255, color.z * 255)
+                            color = phong_model(self.pos, intersection.intersectPoint, self.lightSources, intersection.normal,
+                                                obj.k_ambient, obj.k_diffuse, obj.k_specular, obj.k_reflection, obj.k_transmission, obj.n_coef)
+                            
+                            image[i][j] = (color.x, color.y, color.z)
 
         return image

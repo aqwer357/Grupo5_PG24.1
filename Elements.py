@@ -6,6 +6,12 @@ class Point:
         self.y = y
         self.z = z
 
+    def __eq__(self, other) : 
+        if self.x == other.x and self.y == other.y and self.z == other.z:
+            return True
+        else:
+            return False
+    
     def __repr__(self):
         return f"Point({self.x}, {self.y}, {self.z})"
 
@@ -34,20 +40,25 @@ class Vector:
             return Vector(0, 0, 0)
         return Vector(self.x / magnitude, self.y / magnitude, self.z / magnitude)
 
-
-class Sphere:
-    def __init__(self, center: Point, radius: float, colorRGB: Vector):
-        self.center = center
-        self.radius = radius
-        self.colorRGB = colorRGB
-
-    def __repr__(self):
-        return f"Sphere({self.center}, {self.radius}, {self.colorRGB})"
-
-    class IntersectOutput:
-        def __init__(self, intersectPoint: Point, t):
+class IntersectOutput:
+        def __init__(self, intersectPoint: Point, t, normal: Vector):
             self.intersectPoint = intersectPoint
             self.t = t
+            self.normal = normal
+
+class Sphere:
+    def __init__(self, center: Point, radius: float, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, n_coef):
+        self.center = center
+        self.radius = radius
+        self.k_ambient = k_ambient
+        self.k_diffuse = k_diffuse
+        self.k_specular = k_specular
+        self.k_reflection = k_reflection
+        self.k_transmission = k_transmission
+        self.n_coef = n_coef
+
+    def __repr__(self):
+        return f"Sphere({self.center}, {self.radius})"
 
     def intersect(self, origin: Point, direction: Vector):
         oc = point_subtract(origin, self.center)
@@ -55,7 +66,7 @@ class Sphere:
         b = 2.0 * dot_product(oc, direction)
         c = oc.x**2 + oc.y**2 + oc.z**2 - self.radius**2
         discriminant = b**2 - 4 * a * c
-
+            
         if discriminant < 0:
             # if discriminant < 0 -> no intersection
             return None
@@ -63,29 +74,34 @@ class Sphere:
             # we choose negative in quadratic formula to choose the first point of intersection with the sphere
             t = (-b - discriminant**0.5) / (2.0 * a)
             if t >= 0:
-                intersect_point = self.IntersectOutput(Point(origin.x + t * direction.x,
-                                                             origin.y + t * direction.y,
-                                                             origin.z + t * direction.z),
-                                                             t)
-                return intersect_point
+                intersect_point = Point(origin.x + t * direction.x,
+                                        origin.y + t * direction.y,
+                                        origin.z + t * direction.z)
+
+                normal = point_subtract(intersect_point, self.center)
+
+                intersect_output = IntersectOutput(intersect_point,
+                                                   t,
+                                                   normal)
+                return intersect_output
             else:
                 # t <= 0 --> object is behind camera
                 return None
 
 
 class Plane:
-    def __init__(self, point: Point, normal: Vector, colorRGB: Vector):
+    def __init__(self, point: Point, normal: Vector, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, n_coef):
         self.point = point
         self.normal = normal
-        self.colorRGB = colorRGB
+        self.k_ambient = k_ambient
+        self.k_diffuse = k_diffuse
+        self.k_specular = k_specular
+        self.k_reflection = k_reflection
+        self.k_transmission = k_transmission
+        self.n_coef = n_coef
 
     def __repr__(self):
-        return f"Plane({self.point}, {self.normal}, {self.colorRGB})"
-
-    class IntersectOutput:
-        def __init__(self, intersectPoint: Point, t):
-            self.intersectPoint = intersectPoint
-            self.t = t
+        return f"Plane({self.point}, {self.normal})"
 
     def intersect(self, origin: Point, direction: Vector):
         denom = dot_product(self.normal, direction)
@@ -94,27 +110,33 @@ class Plane:
             diff = point_subtract(self.point, origin)
             t = (diff.x * self.normal.x + diff.y * self.normal.y + diff.z * self.normal.z) / denom
             if t >= 0:
-                intersect_point = self.IntersectOutput(Point(origin.x + t * direction.x,
-                                                             origin.y + t * direction.y,
-                                                             origin.z + t * direction.z),
-                                                             t)
-                return intersect_point
+                intersect_point = Point(origin.x + t * direction.x,
+                                        origin.y + t * direction.y,
+                                        origin.z + t * direction.z)
+
+                intersect_output = IntersectOutput(intersect_point,
+                                                   t,
+                                                   self.normal)
+                return intersect_output
         return None
     
 class TriMesh:
-    def __init__(self, triangleAmt, vertexAmt, vertexList, triangleList, triangleNormals, vertexNormals, colorRGB: Vector):
+    def __init__(self, triangleAmt, vertexAmt, vertexList, triangleList, triangleNormals, vertexNormals, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, n_coef):
         self.triangleAmt = triangleAmt
         self.vertexAmt = vertexAmt
         self.vertexList = vertexList
-        self.triangleList = triangleList # Organizadas por índice
+        self.triangleList = triangleList # Organized by index
         self.triangleNormals = triangleNormals
-        self.vertexNormals = vertexNormals
-        self.colorRGB = colorRGB
 
-    class IntersectOutput:
-        def __init__(self, intersectPoint: Point, t):
-            self.intersectPoint = intersectPoint
-            self.t = t
+## NEED TO CALCULATE VERTEX NORMALS HERE ##
+        self.vertexNormals = vertexNormals
+
+        self.k_ambient = k_ambient
+        self.k_diffuse = k_diffuse
+        self.k_specular = k_specular
+        self.k_reflection = k_reflection
+        self.k_transmission = k_transmission
+        self.n_coef = n_coef
 
     def intersectTriangle(self, origin: Point, direction: Vector, triangleIndex):
         denom = dot_product(self.triangleNormals[triangleIndex], direction)
@@ -152,14 +174,27 @@ class TriMesh:
                 u = 1.0 - v - w
 
                 if v >= 0 and w >= 0 and u >= 0:
-                    intersect_point = self.IntersectOutput(intersectPlanePoint, t)
-                    return intersect_point
+                    intersect_point = Point(origin.x + t * direction.x,
+                                            origin.y + t * direction.y,
+                                            origin.z + t * direction.z)
+
+                    normal = self.triangleNormals
+
+                    # checking if intersect is in a vertex
+                    for vertIndex in range(len(self.vertexList)):
+                        if self.vertexList[vertIndex] == intersect_point:
+                            normal = self.vertexNormals[vertIndex]
+
+
+                    intersect_output = IntersectOutput(intersect_point,
+                                                       t,
+                                                       normal)
+                    return intersect_output
                 else:
                     return None
         return None
     
     def intersect(self, origin: Point, direction: Vector):
-        closestT = 99999999
         intersect_points = []
         for triangleIndex in range(self.triangleAmt):
             intersection = self.intersectTriangle(origin, direction, triangleIndex)

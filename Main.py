@@ -1,6 +1,7 @@
 from Elements import Point, Vector, Sphere, Plane, TriMesh, cross, point_subtract
 from Camera import Camera
 from Transforms import affine_transform
+from Phong import LightSource
 
 def write_ppm(image, width, height, filename):
     with open(filename, 'w') as f:
@@ -40,24 +41,35 @@ def main():
     n4 = cross(point_subtract(p0, p3), point_subtract(p4, p3))
     n4 = n4.get_normalized()
 
-    camera = Camera(Point(0, 0, 0), Point(0, 0, -5), Vector(0, 1, 0), 1.0, height, width)
-    
-    sphere = Sphere(Point(0, 0, -10), 3, Vector(1, 0, 0))  # Red sphere
-    plane = Plane(Point(0, -2, -10), Vector(0, 1, 0), Vector(0, 1, 0))  # Green plane
+    lightSource1 = LightSource(Point(0, 10, -20), Vector(200, 200, 200))
 
-    mesh = TriMesh(2, 
-                   4, 
-                   [p0, p1, p2, p3], 
-                   [(0,1,2), (3,1,2)],
-                   [n1, n2],
-                   [],
-                   Vector(0,0,1)) # Blue mesh
+    camera = Camera(Point(0, 0, 0), Point(0, 0, -5), Vector(0, 1, 0), 1.0, height, width, [lightSource1])
+    
+    reddishK = Vector(0.2, 0, 0)
+    greenishK = Vector(0, 0.2, 0)
+
+    colA = Vector(0.7, 0.2, 0)
+    colB = Vector(0.2, 0.5, 0)
+
+    specularK = Vector(0.4, 0.4, 0.4)
+    diffuseK = Vector (0.3, 0.3, 0.3)
+
+    sphere = Sphere(Point(0, 0, -10), 3, reddishK, colA, specularK, reddishK, reddishK, 100)
+    plane = Plane(Point(0, -2, -10), Vector(0, 1, 0), greenishK, colB, specularK, greenishK, greenishK, 10)
+
+    # mesh = TriMesh(2, 
+    #                4, 
+    #                [p0, p1, p2, p3], 
+    #                [(0,1,2), (3,1,2)],
+    #                [n1, n2],
+    #                [],
+    #                Vector(0,0,1)) # Blue mesh
 
     objects = []
 
-    #objects.append(sphere)
-    #objects.append(plane)
-    objects.append(mesh)
+    objects.append(sphere)
+    objects.append(plane)
+    #objects.append(mesh)
 
     image = camera.raycast(objects)
 
