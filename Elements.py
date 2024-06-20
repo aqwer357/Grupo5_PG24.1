@@ -164,8 +164,7 @@ class TriMesh:
         for triangleIndex in range(self.triangleAmt):
             intersection = self.intersectTriangle(origin, direction, triangleIndex)
 
-            if intersection is not None and intersection.t < closestT:
-                closestT = intersection.t
+            if intersection is not None:
                 intersect_points.append(intersection)
 
         if len(intersect_points) == 0:
