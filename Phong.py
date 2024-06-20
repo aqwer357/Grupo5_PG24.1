@@ -22,12 +22,12 @@ def phong_model(viewPos: Point, intersectPoint: Point, lightSources, normal: Vec
     for source in lightSources:
         light = point_subtract(source.point,intersectPoint).get_normalized()
         scalar = (2 * dot_product(normal, light))
-        reflect = Vector((scalar*normal.x - light.x), (scalar*normal.y - light.y), (scalar*normal.y - light.y)).get_normalized()
+        reflect = Vector((scalar*normal.x - light.x), (scalar*normal.y - light.y), (scalar*normal.z - light.z)).get_normalized()
         il = source.lightColor
 
         r = (il.x * (kd.x * (dot_product(normal,light)) + ks.x * (dot_product(reflect,view))**n))
         g = (il.y * (kd.y * (dot_product(normal,light)) + ks.y * (dot_product(reflect,view))**n))
-        b = (il.y * (kd.y * (dot_product(normal,light)) + ks.y * (dot_product(reflect,view))**n))
+        b = (il.y * (kd.z * (dot_product(normal,light)) + ks.z * (dot_product(reflect,view))**n))
 
         colorResult.x += r
         colorResult.y += g

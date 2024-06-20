@@ -178,7 +178,7 @@ class TriMesh:
                                             origin.y + t * direction.y,
                                             origin.z + t * direction.z)
 
-                    normal = self.triangleNormals
+                    normal = self.triangleNormals[triangleIndex]
 
                     # checking if intersect is in a vertex
                     for vertIndex in range(len(self.vertexList)):
@@ -198,7 +198,6 @@ class TriMesh:
         intersect_points = []
         for triangleIndex in range(self.triangleAmt):
             intersection = self.intersectTriangle(origin, direction, triangleIndex)
-
             if intersection is not None:
                 intersect_points.append(intersection)
 
