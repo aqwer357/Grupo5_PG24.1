@@ -11,7 +11,7 @@ def phong_model(viewPos: Point, intersectPoint: Point, lightSources, normal: Vec
     view = point_subtract(viewPos, intersectPoint).get_normalized()
 
     # Ambient light coefficient
-    ia = Vector(60, 60, 0)
+    ia = Vector(60, 60, 60)
 
     normal = normal.get_normalized()
     

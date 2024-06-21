@@ -1,4 +1,4 @@
-from Elements import Point, Vector, IntersectOutput, point_subtract, cross
+from Elements import Point, Vector, IntersectOutput, point_subtract, cross, vector_add, vector_sub, vector_scalar
 from Phong import phong_model
 
 # defines camera and raycasting
@@ -18,13 +18,15 @@ class Camera:
     def __init__(self, pos: Point, target: Point, up: Vector, dist: float, hScreen: int, wScreen: int, lightSources):
         self.pos = pos
         self.target = target
-        self.w = point_subtract(pos, target).get_normalized()
+        self.w = point_subtract(target, pos).get_normalized()
         self.u = cross(up, self.w).get_normalized()
-        self.v = cross(self.w, self.u)
+        self.v = up.get_normalized()
         self.dist = dist
         self.hScreen = hScreen
         self.wScreen = wScreen
         self.lightSources = lightSources
+
+        self.screenCenterVector = vector_scalar(self.dist, self.w)
 
     def __repr__(self):
         return f"Camera({self.pos}, {self.target}, {self.dist}, {self.hScreen}, {self.wScreen})"
@@ -32,11 +34,14 @@ class Camera:
     def raycast(self, objects):
         image = [[(0, 0, 0) for _ in range(self.wScreen)] for _ in range(self.hScreen)]
 
+        displaceVert = vector_scalar(-(2 * 0.5 / (self.hScreen - 1)), self.v)
+        displaceHort = vector_scalar(-(2 * 0.5 / (self.wScreen - 1)), self.u)
+        pixel00 = vector_sub(self.screenCenterVector, vector_add(vector_scalar(0.5, self.v), vector_scalar(0.5, self.u)))
+
         for i in range(self.hScreen):
             for j in range(self.wScreen):
-                x = (2 * (j + 0.5) / self.wScreen - 1) * (self.wScreen / self.hScreen)
-                y = 1 - 2 * (i + 0.5) / self.hScreen
-                ray = Ray(self.pos, Vector(x, y, -1))
+                
+                ray = Ray(self.pos, vector_add(vector_add(vector_scalar(i, displaceVert), vector_scalar(j, displaceHort)), pixel00))
 
                 # allows us to know which object is closest by using scalar of ray
                 closestT = 99999999

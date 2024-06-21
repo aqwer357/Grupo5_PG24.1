@@ -212,6 +212,15 @@ def dot_product(v1: Vector, v2: Vector):
 def point_subtract(p1: Point, p2: Point) -> Vector:
     return Vector(p1.x - p2.x, p1.y - p2.y, p1.z - p2.z)
 
+def vector_add(v1: Vector, v2: Vector):
+    return Vector(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z)
+
+def vector_sub(v1: Vector, v2: Vector):
+    return Vector(v1.x + v2.x, v1.y + v2.y, v1.z + v2.z)
+
+def vector_scalar(scalar, v1: Vector):
+    return Vector(v1.x * scalar, v1.y * scalar, v1.z * scalar)
+
 def cross(v1: Vector, v2: Vector) -> Vector:
     return Vector(
         v1.y * v2.z - v1.z * v2.y,
