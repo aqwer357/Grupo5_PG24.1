@@ -65,7 +65,6 @@ def main():
     #                [p0, p1, p2, p3], 
     #                [(0,1,2), (3,1,2)],
     #                [n1, n2],
-    #                [],
     #                gray,
     #                gray,
     #                gray,
@@ -73,7 +72,7 @@ def main():
     #                gray,
     #                59)
 
-    lightSource = LightSource(Point(0,1,0), Vector(255,255,255))
+    lightSource = LightSource(Point(2,1,0), Vector(255,255,255))
 
     sphere = Sphere(Point(0, 0, 2), 1, Vector(0,0,0.2), Vector(0,0,0.7), Vector(0.2,0.2,0.2), Vector(0,0,0.2), Vector(0,0,0.2), 100)
     camera = Camera(Point(0, 0, 0), Point(0, 0, 1), Vector(0, 1, 0), 1, width, height, [lightSource])

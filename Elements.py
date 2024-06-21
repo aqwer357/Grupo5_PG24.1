@@ -1,4 +1,5 @@
 # defines elements of R3
+import statistics
 
 class Point:
     def __init__(self, x, y, z):
@@ -121,15 +122,28 @@ class Plane:
         return None
     
 class TriMesh:
-    def __init__(self, triangleAmt, vertexAmt, vertexList, triangleList, triangleNormals, vertexNormals, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, n_coef):
+    def __init__(self, triangleAmt, vertexAmt, vertexList, triangleList, triangleNormals, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, n_coef):
         self.triangleAmt = triangleAmt
         self.vertexAmt = vertexAmt
         self.vertexList = vertexList
         self.triangleList = triangleList # Organized by index
         self.triangleNormals = triangleNormals
 
-## NEED TO CALCULATE VERTEX NORMALS HERE ##
-        self.vertexNormals = vertexNormals
+        self.vertexNormals = []
+
+        for vertI in range(vertexAmt):
+            x = []
+            y = []
+            z = []
+
+            for triI in range(triangleAmt):
+                if vertI in self.triangleList[triI]:
+                    x.append(self.triangleNormals[triI].x)
+                    y.append(self.triangleNormals[triI].y)
+                    z.append(self.triangleNormals[triI].z)
+
+            vertexN = Vector(statistics.mean(x), statistics.mean(y), statistics.mean(z))
+            self.vertexNormals.append(vertexN)
 
         self.k_ambient = k_ambient
         self.k_diffuse = k_diffuse
