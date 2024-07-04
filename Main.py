@@ -16,7 +16,7 @@ def write_ppm(image, width, height, filename):
 
 
 def main():
-    width, height = 600, 600
+    width, height = 400, 400
 
     p0 = Point(-3, 3, -20)
     p1 = Point(3, 3, -20)
@@ -34,29 +34,30 @@ def main():
     n4 = cross(point_subtract(p0, p3), point_subtract(p4, p3))
     n4 = n4.get_normalized()
 
-    lightSource1 = LightSource(Point(20, 10, -20), Vector(200, 200, 200))
+    lightSource1 = LightSource(Point(0, 1, 0), Vector(200, 200, 200))
 
-    #lightSource2 = LightSource(Point(0, 3, 0), Vector(100, 100, 100))
+    lightSource2 = LightSource(Point(0, 3, 0), Vector(100, 100, 100))
 
-    camera = Camera(Point(0, 0, 0), Point(0, 0, 1), Vector(0, 1, 0), 0.2, height, width, [lightSource1 ])
+    camera = Camera(Point(0, 0, 0), Point(0, 0, 1), Vector(0, 1, 0), 0.5, height, width, [lightSource1])
     
-    reddishK = Vector(0.2, 0, 0)
+    reddishK = Vector(0.2, 0, 0.1)
     greenishK = Vector(0, 0.2, 0)
-    blueishK = Vector(0, 0, 0.2)
+    blueishK = Vector(0.1, 0, 0.2)
 
     colA = Vector(0.7, 0.2, 0)
     colB = Vector(0.2, 0.5, 0)
-    colC = Vector(0.4, 0.1, 0.5)
+    colC = Vector(0.2, 0.1, 0.5)
 
     gray = Vector(0.5, 0.5, 0.5)
 
     specularK = Vector(0.2, 0.4, 0.2)
     diffuseK = Vector (0.3, 0.3, 0.3)
 
-    sphere = Sphere(Point(0, 0, 3), 2, reddishK, colA,  Vector(0.9, 0.9, 0.9), reddishK, reddishK, 1, 100)
-    plane = Plane(Point(0, -2, -10), Vector(0, 1, 0), greenishK, colB, specularK, greenishK, greenishK, 1, 10)
+    sphere = Sphere(Point(3, 0, 6), 2, reddishK, colA,  Vector(0.9, 0.9, 0.9), reddishK, reddishK, 1, 100)
+    plane = Plane(Point(0, -1, -10), Vector(0, 1, 0), greenishK, colB, specularK, Vector(0, 0, 0), greenishK, 1, 10)
 
-    sphere2 = Sphere(Point(20, 0, -30), 3, blueishK, colC, specularK, blueishK, blueishK, 1, 100)
+    sphere2 = Sphere(Point(-3, 0, 6), 2, blueishK, colC, specularK, blueishK, blueishK, 1, 100)
+
     mesh = TriMesh(2, 
                    4, 
                    [p0, p1, p2, p3], 
@@ -75,7 +76,7 @@ def main():
     objects = []
 
     objects.append(sphere)
-    #objects.append(sphere2)
+    objects.append(sphere2)
     #objects.append(mesh)
     objects.append(plane)
 
