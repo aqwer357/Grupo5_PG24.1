@@ -1,5 +1,6 @@
-from Elements import Point, Vector, IntersectOutput, point_subtract, cross, vector_add, vector_sub, vector_scalar
+from Elements import Point, Vector, IntersectOutput, point_subtract, cross, vector_add, vector_sub, vector_scalar, dot_product
 from Phong import phong_model
+import math
 
 # defines camera and raycasting
 
@@ -26,12 +27,13 @@ class Camera:
         self.wScreen = wScreen
         self.lightSources = lightSources
 
+        self.recursionMax = 4
         self.screenCenterVector = vector_scalar(self.dist, self.w)
 
     def __repr__(self):
         return f"Camera({self.pos}, {self.target}, {self.dist}, {self.hScreen}, {self.wScreen})"
     
-    def raycast(self, objects):
+    def render(self, objects):
         image = [[(0, 0, 0) for _ in range(self.wScreen)] for _ in range(self.hScreen)]
 
         displaceVert = vector_scalar(-(2 * 0.5 / (self.hScreen - 1)), self.v)
@@ -43,27 +45,73 @@ class Camera:
                 
                 ray = Ray(self.pos, vector_add(vector_add(vector_scalar(i, displaceVert), vector_scalar(j, displaceHort)), pixel00))
 
-                # allows us to know which object is closest by using scalar of ray
-                closestT = 99999999
-                
-                for obj in objects:
-                    intersection = obj.intersect(ray.origin, ray.direction)
-
-                    if intersection is not None:
-                        if obj.__class__.__name__ == 'TriMesh':
-                                for intersect in intersection:
-                                    # TriMesh returns intersection list and this for parses them
-                                    if intersect.t < closestT:
-                                        closestT = intersect.t
-                                        color = phong_model(self.pos, intersect.intersectPoint, self.lightSources, intersect.normal,
-                                                             obj.k_ambient, obj.k_diffuse, obj.k_specular, obj.k_reflection, obj.k_transmission, obj.n_coef)
-
-                                        image[i][j] = (color.x, color.y, color.z)
-                        elif intersection.t < closestT:
-                            closestT = intersection.t
-                            color = phong_model(self.pos, intersection.intersectPoint, self.lightSources, intersection.normal,
-                                                obj.k_ambient, obj.k_diffuse, obj.k_specular, obj.k_reflection, obj.k_transmission, obj.n_coef)
-                            
-                            image[i][j] = (color.x, color.y, color.z)
+                color = self.raytrace(ray, objects, 0)
+                image[i][j] = (color.x, color.y, color.z)
 
         return image
+    
+    def raytrace(self, ray: Ray, objects, recursionAmt):
+        color = Vector(0,0,0)
+        if recursionAmt >= self.recursionMax:
+            return color
+        for obj in objects:
+            intersection = obj.intersect(ray.origin, ray.direction)
+
+            closestT = 99999999
+
+            if intersection is not None:
+                if obj.__class__.__name__ == 'TriMesh':
+                        for intersect in intersection:
+                            # TriMesh returns intersection list and this for parses them
+                            if intersect.t < closestT:
+                                closestT = intersect.t
+                                
+                                for source in self.lightSources:
+                                    light = point_subtract(source.point, intersect.intersectPoint).get_normalized()
+                                    normal = intersect.normal
+                                    scalar = (2 * dot_product(normal, light))
+
+                                    if obj.k_reflection.get_magnitude() > 0:
+                                        reflect = Vector((scalar*normal.x - light.x), (scalar*normal.y - light.y), (scalar*normal.z - light.z)).get_normalized()
+                                        reflectRay = Ray(intersect.intersectPoint, reflect)
+
+                                        ir = phong_model(ray.origin, intersect.intersectPoint, [source], intersect.normal,
+                                                            obj.k_ambient, obj.k_diffuse, obj.k_specular, obj.k_reflection, obj.k_transmission, obj.n_coef)
+
+                                    ## REFRACTION - WIP ##
+                                    # if obj.k_transmission.get_magnitude() > 0:
+                                    #     n = intersect.normal
+                                    #     cos = dot_product(ray.direction, intersect.normal)
+                                    #     ior = obj.refractIndex
+
+                                    #     if cos < 0:
+                                    #         n = vector_scalar(-1, n)
+                                    #         ior = 1 / ior
+                                    #         cos = -1 * cos
+
+                                    #     delta = 1 - (1 - cos * cos) / (ior * ior)
+
+                                    #     if delta >=0:
+                                    #         refract = 
+                            
+                elif intersection.t < closestT:
+                    closestT = intersection.t
+                    
+                    ir = Vector(0,0,0)
+                    for source in self.lightSources:
+                        light = point_subtract(source.point, intersection.intersectPoint).get_normalized()
+                        normal = intersection.normal
+                        scalar = (2 * dot_product(normal, light))
+
+                        if obj.k_reflection.get_magnitude() > 0:
+                            reflect = Vector((scalar*normal.x - light.x), (scalar*normal.y - light.y), (scalar*normal.z - light.z)).get_normalized()
+                            reflectRay = Ray(intersection.intersectPoint, reflect)
+
+                            reflectColor = self.raytrace(reflectRay, objects, recursionAmt+1)
+                            
+                            ir = Vector(reflectColor.x + ir.x, reflectColor.y + ir.y, reflectColor.z + ir.z)
+                    
+                    color = phong_model(ray.origin, intersection.intersectPoint, self.lightSources, intersection.normal,
+                                        obj.k_ambient, obj.k_diffuse, obj.k_specular, obj.k_reflection, obj.k_transmission, obj.n_coef, ir)
+            
+        return color

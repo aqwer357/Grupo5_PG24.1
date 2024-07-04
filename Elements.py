@@ -48,7 +48,7 @@ class IntersectOutput:
             self.normal = normal
 
 class Sphere:
-    def __init__(self, center: Point, radius: float, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, n_coef):
+    def __init__(self, center: Point, radius: float, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, refractIndex, n_coef):
         self.center = center
         self.radius = radius
         self.k_ambient = k_ambient
@@ -56,6 +56,7 @@ class Sphere:
         self.k_specular = k_specular
         self.k_reflection = k_reflection
         self.k_transmission = k_transmission
+        self.refractIndex = refractIndex
         self.n_coef = n_coef
 
     def __repr__(self):
@@ -91,7 +92,7 @@ class Sphere:
 
 
 class Plane:
-    def __init__(self, point: Point, normal: Vector, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, n_coef):
+    def __init__(self, point: Point, normal: Vector, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, refractIndex, n_coef):
         self.point = point
         self.normal = normal
         self.k_ambient = k_ambient
@@ -99,6 +100,7 @@ class Plane:
         self.k_specular = k_specular
         self.k_reflection = k_reflection
         self.k_transmission = k_transmission
+        self.refractIndex = refractIndex
         self.n_coef = n_coef
 
     def __repr__(self):
@@ -122,7 +124,7 @@ class Plane:
         return None
     
 class TriMesh:
-    def __init__(self, triangleAmt, vertexAmt, vertexList, triangleList, triangleNormals, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, n_coef):
+    def __init__(self, triangleAmt, vertexAmt, vertexList, triangleList, triangleNormals, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, refractIndex, n_coef):
         self.triangleAmt = triangleAmt
         self.vertexAmt = vertexAmt
         self.vertexList = vertexList
@@ -150,6 +152,7 @@ class TriMesh:
         self.k_specular = k_specular
         self.k_reflection = k_reflection
         self.k_transmission = k_transmission
+        self.refractIndex = refractIndex
         self.n_coef = n_coef
 
     def intersectTriangle(self, origin: Point, direction: Vector, triangleIndex):
