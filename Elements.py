@@ -75,7 +75,7 @@ class Sphere:
         else:
             # we choose negative in quadratic formula to choose the first point of intersection with the sphere
             t = (-b - discriminant**0.5) / (2.0 * a)
-            if t >= 0:
+            if t > 0.0001:
                 intersect_point = Point(origin.x + t * direction.x,
                                         origin.y + t * direction.y,
                                         origin.z + t * direction.z)
@@ -87,8 +87,20 @@ class Sphere:
                                                    normal)
                 return intersect_output
             else:
-                # t <= 0 --> object is behind camera
-                return None
+                t = (-b + discriminant**0.5) / (2.0 * a)
+                if t > 0.0001:
+                    intersect_point = Point(origin.x + t * direction.x,
+                                            origin.y + t * direction.y,
+                                            origin.z + t * direction.z)
+
+                    normal = point_subtract(intersect_point, self.center)
+
+                    intersect_output = IntersectOutput(intersect_point,
+                                                    t,
+                                                    normal)
+                    return intersect_output
+                else:
+                    return None
 
 
 class Plane:

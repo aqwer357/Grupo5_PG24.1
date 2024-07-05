@@ -114,20 +114,17 @@ class Camera:
                             ir = Vector(reflectColor.x + ir.x, reflectColor.y + ir.y, reflectColor.z + ir.z)
                     
                     # REFRACTION - WIP ##
-                    if obj.k_transmission.get_magnitude() > 0:
+                    if obj.k_transmission.get_magnitude() > 0.0001:
                         n = intersection.normal.get_normalized()
                         i = ray.direction.get_normalized()
                         cosIN = dot_product(i, n)
 
-                        if cosIN < 0:
+                        if cosIN < 0.001:
                             cosIN = -1*cosIN
                             n = vector_scalar(-1, n)
 
                         print(cosIN)
-                        if cosIN > 1:
-                            cosIN = 1
-                        elif cosIN < -1:
-                            cosIN = -1
+                        
                         senIN = math.sqrt(1 - (cosIN * cosIN))
                         
                         ior = outIOR/inIOR
