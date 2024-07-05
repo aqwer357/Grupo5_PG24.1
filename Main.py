@@ -54,7 +54,7 @@ def main():
     diffuseK = Vector (0.3, 0.3, 0.3)
 
     sphere = Sphere(Point(0, 0, 6), 2, Vector(0, 0, 0), Vector(0, 0, 0),  Vector(0.1, 0.1, 0.1), Vector(0.0, 0.0, 0.0), Vector(1, 1, 1), 1.5, 100)
-    plane = Plane(Point(0, -3, -10), Vector(0, 1, 0), greenishK, colB, specularK, Vector(0, 0, 0), Vector(0, 0, 0), 1, 10)
+    plane = Plane(Point(0, -1, -10), Vector(0, 1, 0), greenishK, colB, specularK, Vector(0, 0, 0), Vector(0, 0, 0), 1, 10)
 
     sphere2 = Sphere(Point(-3, 0, 6), 2, blueishK, colC, specularK, blueishK, Vector(0, 0, 0), 1, 100)
 

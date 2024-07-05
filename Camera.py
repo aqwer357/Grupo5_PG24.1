@@ -122,8 +122,6 @@ class Camera:
                         if cosIN < 0.001:
                             cosIN = -1*cosIN
                             n = vector_scalar(-1, n)
-
-                        print(cosIN)
                         
                         senIN = math.sqrt(1 - (cosIN * cosIN))
                         
@@ -134,6 +132,8 @@ class Camera:
                         cosOUT = math.sqrt(1 - (senOUT * senOUT))
 
                         refract = vector_sub(vector_scalar(1/ior, i), vector_scalar(cosOUT - (1/ior*cosIN), n))
+
+                        print(refract)
 
                         transRay = Ray(intersection.intersectPoint, refract)
 
