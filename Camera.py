@@ -120,13 +120,13 @@ class Camera:
                         cos = dot_product(i, n)
                         ior = outIOR/inIOR
 
-                        if cos < 0.00000001:
-                            n = vector_scalar(-1,n)
-
                         delta = 1 - (ior * ior * (1 - (cos * cos)))
 
                         if delta >= 0:
                             deltasqr = math.sqrt(delta)
+
+                            if cos < 0:
+                                deltasqr = -deltasqr
 
                             refract = vector_add(vector_scalar(deltasqr, n),
                                       vector_scalar(1/ior, vector_sub(i, vector_scalar(cos, n))))
