@@ -53,8 +53,8 @@ def main():
     specularK = Vector(0.2, 0.4, 0.2)
     diffuseK = Vector (0.3, 0.3, 0.3)
 
-    sphere = Sphere(Point(0, 0, 6), 2, Vector(0, 0, 0), Vector(0, 0, 0),  Vector(0.9, 0.9, 0.9), Vector(0, 0, 0), Vector(0.5, 0.5, 0.5), 1.5, 100)
-    plane = Plane(Point(0, -1, -10), Vector(0, 1, 0), greenishK, colB, specularK, Vector(0, 0, 0), greenishK, 1, 10)
+    sphere = Sphere(Point(0, 0, 6), 2, Vector(0, 0, 0), Vector(0, 0, 0),  Vector(0.1, 0.1, 0.1), Vector(0.0, 0.0, 0.0), Vector(0.5, 0.5, 0.5), 1.5, 100)
+    plane = Plane(Point(0, -3, -10), Vector(0, 1, 0), greenishK, colB, specularK, Vector(0, 0, 0), Vector(0, 0, 0), 1, 10)
 
     sphere2 = Sphere(Point(-3, 0, 6), 2, blueishK, colC, specularK, blueishK, Vector(0, 0, 0), 1, 100)
 

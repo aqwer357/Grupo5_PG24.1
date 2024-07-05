@@ -115,13 +115,26 @@ class Camera:
                     
                     # REFRACTION - WIP ##
                     if obj.k_transmission.get_magnitude() > 0:
-                        n = intersection.normal
+                        n = intersection.normal.get_normalized()
                         i = ray.direction.get_normalized()
                         cosIN = dot_product(i, n)
 
+                        if cosIN < 0:
+                            cosIN = -1*cosIN
+                            n = vector_scalar(-1, n)
+
+                        print(cosIN)
+                        if cosIN > 1:
+                            cosIN = 1
+                        elif cosIN < -1:
+                            cosIN = -1
+                        senIN = math.sqrt(1 - (cosIN * cosIN))
+                        
                         ior = outIOR/inIOR
 
-                        cosOUT = (1 - cosIN) / ior
+                        senOUT = senIN/ior
+
+                        cosOUT = math.sqrt(1 - (senOUT * senOUT))
 
                         refract = vector_sub(vector_scalar(1/ior, i), vector_scalar(cosOUT - (1/ior*cosIN), n))
 
