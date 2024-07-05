@@ -60,8 +60,10 @@ class Camera:
             intersection = obj.intersect(ray.origin, ray.direction)
 
             if inIOR == 1:
+                # outIOR == IOR of where ray comes out
                 outIOR = obj.refractIndex
             else:
+                inIOR = obj.refractIndex
                 outIOR = 1
                 
             if intersection is not None:
@@ -111,30 +113,30 @@ class Camera:
                             
                             ir = Vector(reflectColor.x + ir.x, reflectColor.y + ir.y, reflectColor.z + ir.z)
                     
-                    ## REFRACTION - WIP ##
-                    # if obj.k_transmission.get_magnitude() > 0:
-                    #     n = intersection.normal
-                    #     i = ray.direction.get_normalized()
-                    #     cos = dot_product(i, n)
-                    #     ior = obj.refractIndex
+                    # REFRACTION - WIP ##
+                    if obj.k_transmission.get_magnitude() > 0:
+                        n = intersection.normal
+                        i = ray.direction.get_normalized()
+                        cos = dot_product(i, n)
+                        ior = outIOR/inIOR
 
-                    #     if cos < 0.00000001:
-                    #         n = vector_scalar(-1,n)
+                        if cos < 0.00000001:
+                            n = vector_scalar(-1,n)
 
-                    #     delta = 1 - (ior * ior * (1 - (cos * cos)))
+                        delta = 1 - (ior * ior * (1 - (cos * cos)))
 
-                    #     if delta >= 0:
-                    #         deltasqr = math.sqrt(delta)
+                        if delta >= 0:
+                            deltasqr = math.sqrt(delta)
 
-                    #         refract = vector_add(vector_scalar(deltasqr, n),
-                    #                   vector_scalar(1/ior, vector_sub(i, vector_scalar(cos, n))))
-                    #         #refract = vector_sub(vector_scalar(1/(-ior), ray.direction), vector_scalar(deltasqr - cos/ior), n)
+                            refract = vector_add(vector_scalar(deltasqr, n),
+                                      vector_scalar(1/ior, vector_sub(i, vector_scalar(cos, n))))
+                            #refract = vector_sub(vector_scalar(1/(-ior), ray.direction), vector_scalar(deltasqr - cos/ior), n)
 
-                    #         transRay = Ray(intersection.intersectPoint, refract)
+                            transRay = Ray(intersection.intersectPoint, refract)
 
-                    #         it = self.raytrace(transRay, objects, recursionAmt+1, ior)
+                            it = self.raytrace(transRay, objects, recursionAmt+1, outIOR)
 
-                    # color = phong_model(ray.origin, intersection.intersectPoint, self.lightSources, intersection.normal,
-                    #                     obj.k_ambient, obj.k_diffuse, obj.k_specular, obj.k_reflection, obj.k_transmission, obj.n_coef, ir, it)
+                    color = phong_model(ray.origin, intersection.intersectPoint, self.lightSources, intersection.normal,
+                                        obj.k_ambient, obj.k_diffuse, obj.k_specular, obj.k_reflection, obj.k_transmission, obj.n_coef, ir, it)
             
         return color

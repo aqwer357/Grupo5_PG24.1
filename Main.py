@@ -53,10 +53,10 @@ def main():
     specularK = Vector(0.2, 0.4, 0.2)
     diffuseK = Vector (0.3, 0.3, 0.3)
 
-    sphere = Sphere(Point(3, 0, 6), 2, reddishK, colA,  Vector(0.9, 0.9, 0.9), reddishK, reddishK, 1, 100)
+    sphere = Sphere(Point(0, 0, 6), 2, Vector(0, 0, 0), Vector(0, 0, 0),  Vector(0.9, 0.9, 0.9), Vector(0, 0, 0), Vector(0.5, 0.5, 0.5), 1.5, 100)
     plane = Plane(Point(0, -1, -10), Vector(0, 1, 0), greenishK, colB, specularK, Vector(0, 0, 0), greenishK, 1, 10)
 
-    sphere2 = Sphere(Point(-3, 0, 6), 2, blueishK, colC, specularK, blueishK, blueishK, 1, 100)
+    sphere2 = Sphere(Point(-3, 0, 6), 2, blueishK, colC, specularK, blueishK, Vector(0, 0, 0), 1, 100)
 
     mesh = TriMesh(2, 
                    4, 
@@ -76,7 +76,7 @@ def main():
     objects = []
 
     objects.append(sphere)
-    objects.append(sphere2)
+    #objects.append(sphere2)
     #objects.append(mesh)
     objects.append(plane)
 
