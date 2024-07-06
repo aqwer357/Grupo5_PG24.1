@@ -133,8 +133,6 @@ class Camera:
 
                         refract = vector_sub(vector_scalar(1/ior, i), vector_scalar(cosOUT - (1/ior*cosIN), n))
 
-                        print(refract)
-
                         transRay = Ray(intersection.intersectPoint, refract)
 
                         it = self.raytrace(transRay, objects, recursionAmt+1, outIOR)
