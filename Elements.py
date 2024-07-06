@@ -124,7 +124,7 @@ class Plane:
         if denom != 0:
             diff = point_subtract(self.point, origin)
             t = (diff.x * self.normal.x + diff.y * self.normal.y + diff.z * self.normal.z) / denom
-            if t >= 0:
+            if t > 0.001:
                 intersect_point = Point(origin.x + t * direction.x,
                                         origin.y + t * direction.y,
                                         origin.z + t * direction.z)
@@ -180,7 +180,7 @@ class TriMesh:
             t = dot_product(diff, self.triangleNormals[triangleIndex]) / denom
             
             # if intersects with plane, check for triangle
-            if t >= 0:
+            if t > 0.001:
                 intersectPlanePoint = Point(origin.x + t * direction.x,
                                             origin.y + t * direction.y,
                                             origin.z + t * direction.z)
