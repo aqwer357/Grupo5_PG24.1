@@ -1,6 +1,5 @@
-from Elements import Point, Vector, Sphere, Plane, TriMesh, cross, point_subtract
+from Elements import Point, Vector, Sphere, Plane
 from Camera import Camera
-from Transforms import affine_transform
 from Phong import LightSource
 
 def write_ppm(image, width, height, filename):
@@ -11,82 +10,71 @@ def write_ppm(image, width, height, filename):
         for row in image:
             for color in row:
                 r, g, b = color
-                f.write(f"{r} {g} {b} ")
+                f.write(f"{int(r)} {int(g)} {int(b)} ")
             f.write("\n")
 
+def render_scene(spheres, planes, lights, camera_pos, output_filename):
+    width, height = 400, 400
+    objects = spheres + planes
+    camera = Camera(camera_pos, Point(0, 0, 1), Vector(0, 1, 0), 0.5, height, width, lights)
+    image = camera.render(objects)
+    write_ppm(image, width, height, output_filename)
+    print(f"Imagem salva em {output_filename}")
 
 def main():
-    width, height = 400, 400
+    scenarios = [
+        # Cenário 1: Distribuição Horizontal
+        {
+            "spheres": [
+                Sphere(Point(-4, 0, 10), 1.5, Vector(0.1, 0.1, 0.1), Vector(0.7, 0.2, 0.2), Vector(1, 1, 1), Vector(0.3, 0.3, 0.3), Vector(0, 0, 0), 1.5, 100),
+                Sphere(Point(0, 0, 10), 1.5, Vector(0.1, 0.1, 0.1), Vector(0.2, 0.7, 0.2), Vector(1, 1, 1), Vector(0.3, 0.3, 0.3), Vector(0, 0, 0), 1.5, 100),
+                Sphere(Point(4, 0, 10), 1.5, Vector(0.1, 0.1, 0.1), Vector(0.2, 0.2, 0.7), Vector(1, 1, 1), Vector(0.3, 0.3, 0.3), Vector(0, 0, 0), 1.5, 100)
+            ],
+            "planes": [
+                Plane(Point(0, -3, -10), Vector(0, 1, 0), Vector(0.2, 0.2, 0.2), Vector(0.7, 0.7, 0.7), Vector(1, 1, 1), Vector(0.3, 0.3, 0.3), Vector(0, 0, 0), 1, 10)
+            ],
+            "lights": [LightSource(Point(0, 10, -10), Vector(200, 200, 200))],
+            "camera_pos": Point(0, 0, -20),
+            "output_filename": "output1.ppm"
+        },
+        # Cenário 2: Distribuição Vertical
+        {
+            "spheres": [
+                Sphere(Point(0, -4, 10), 1.5, Vector(0.1, 0.1, 0.1), Vector(0.7, 0.7, 0.2), Vector(1, 1, 1), Vector(0.3, 0.3, 0.3), Vector(0, 0, 0), 1.5, 100),
+                Sphere(Point(0, 0, 10), 1.5, Vector(0.1, 0.1, 0.1), Vector(0.7, 0.2, 0.7), Vector(1, 1, 1), Vector(0.3, 0.3, 0.3), Vector(0, 0, 0), 1.5, 100),
+                Sphere(Point(0, 4, 10), 1.5, Vector(0.1, 0.1, 0.1), Vector(0.2, 0.7, 0.7), Vector(1, 1, 1), Vector(0.3, 0.3, 0.3), Vector(0, 0, 0), 1.5, 100)
+            ],
+            "planes": [
+                Plane(Point(0, -3, -10), Vector(0, 1, 0), Vector(0.2, 0.2, 0.2), Vector(0.7, 0.7, 0.7), Vector(1, 1, 1), Vector(0.3, 0.3, 0.3), Vector(0, 0, 0), 1, 10)
+            ],
+            "lights": [LightSource(Point(0, 10, -10), Vector(200, 200, 200))],
+            "camera_pos": Point(0, 0, -20),
+            "output_filename": "output2.ppm"
+        },
+        # Cenário 3: Distribuição em Profundidade
+        {
+            "spheres": [
+                Sphere(Point(0, 0, 8), 1.5, Vector(0.1, 0.1, 0.1), Vector(0.2, 0.7, 0.2), Vector(1, 1, 1), Vector(0.3, 0.3, 0.3), Vector(0, 0, 0), 1.5, 100),
+                Sphere(Point(0, 0, 10), 1.5, Vector(0.1, 0.1, 0.1), Vector(0.2, 0.2, 0.7), Vector(1, 1, 1), Vector(0.3, 0.3, 0.3), Vector(0, 0, 0), 1.5, 100),
+                Sphere(Point(0, 0, 12), 1.5, Vector(0.1, 0.1, 0.1), Vector(0.7, 0.2, 0.2), Vector(1, 1, 1), Vector(0.3, 0.3, 0.3), Vector(0, 0, 0), 1.5, 100)
+            ],
+            "planes": [
+                Plane(Point(0, -3, -10), Vector(0, 1, 0), Vector(0.2, 0.2, 0.2), Vector(0.7, 0.7, 0.7), Vector(1, 1, 1), Vector(0.3, 0.3, 0.3), Vector(0, 0, 0), 1, 10)
+            ],
+            "lights": [LightSource(Point(0, 10, -10), Vector(200, 200, 200))],
+            "camera_pos": Point(0, 0, -20),
+            "output_filename": "output3.ppm"
+        }
+    ]
 
-    # p0 = Point(-3, 3, -10)
-    # p1 = Point(3, 3, -10)
-    # p2 = Point(-3, -3, -10)
-    # p3 = Point(3, -3, -10)
-    # p4 = Point(20, 2, -10)
-
-    # p0 = affine_transform(p0, "rotate_x", 0, 0, 2, 45)
-    # p1 = affine_transform(p1, "rotate_x", 0, 0, 2, 45)
-    # p2 = affine_transform(p2, "rotate_x", 0, 0, 2, 45)
-    # p3 = affine_transform(p3, "rotate_x", 0, 0, 2, 45)
-    # n1 = affine_transform(Vector(0, 0, 1), "rotate_x", 0, 0, 2, 45)
-    # n2 = affine_transform(Vector(0, 0, 1), "rotate_x", 0, 0, 2, 45)
-
-    # n3 = cross(point_subtract(p3, p2), point_subtract(p4, p2))
-    # n3 = n3.get_normalized()
-
-    # n4 = cross(point_subtract(p0, p3), point_subtract(p4, p3))
-    # n4 = n4.get_normalized()
-
-    # lightSource1 = LightSource(Point(20, 10, -20), Vector(200, 200, 200))
-
-    # lightSource2 = LightSource(Point(0, 3, 0), Vector(200, 200, 200))
-
-    # camera = Camera(Point(0, 0, 0), Point(0, 0, -5), Vector(0, 1, 0), 1.0, height, width, [ lightSource2])
-    
-    # reddishK = Vector(0.2, 0, 0)
-    # greenishK = Vector(0, 0.2, 0)
-    # blueishK = Vector(0, 0, 0.2)
-
-    # colA = Vector(0.7, 0.2, 0)
-    # colB = Vector(0.2, 0.5, 0)
-    # colC = Vector(0.3, 0.1, 0.5)
-
-    # gray = Vector(0.5, 0.5, 0.5)
-
-    # specularK = Vector(0.2, 0.4, 0.2)
-    # diffuseK = Vector (0.3, 0.3, 0.3)
-
-    # sphere = Sphere(Point(0, 0, -10), 3, reddishK, colA, specularK, reddishK, reddishK, 100)
-    # plane = Plane(Point(0, -2, -10), Vector(0, 1, 0), greenishK, colB, specularK, greenishK, greenishK, 10)
-
-    # sphere2 = Sphere(Point(20, 0, -20), 3, blueishK, colC, specularK, blueishK, blueishK, 100)
-    # mesh = TriMesh(2, 
-    #                4, 
-    #                [p0, p1, p2, p3], 
-    #                [(0,1,2), (3,1,2)],
-    #                [n1, n2],
-    #                gray,
-    #                gray,
-    #                gray,
-    #                gray,
-    #                gray,
-    #                59)
-
-    lightSource = LightSource(Point(2,1,0), Vector(255,255,255))
-
-    sphere = Sphere(Point(0, 0, 2), 1, Vector(0,0,0.2), Vector(0,0,0.7), Vector(0.2,0.2,0.2), Vector(0,0,0.2), Vector(0,0,0.2), 100)
-    camera = Camera(Point(0, 0, 0), Point(0, 0, 1), Vector(0, 1, 0), 1, width, height, [lightSource])
-
-
-    objects = []
-
-    objects.append(sphere)
-    
-    image = camera.raycast(objects)
-
-    write_ppm(image, width, height, "output.ppm")
-    print("Image written to output.ppm")
-
+    for scenario in scenarios:
+        render_scene(
+            scenario["spheres"],
+            scenario["planes"],
+            scenario["lights"],
+            scenario["camera_pos"],
+            scenario["output_filename"]
+        )
 
 if __name__ == "__main__":
     main()
