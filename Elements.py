@@ -247,12 +247,13 @@ class TriMesh:
             return intersect_points
 
 class AreaLight:
-    def __init__(self, llCorner: Point, uVector: Vector, vVector: Vector, uSteps, vSteps, lightColor):
+    def __init__(self, llCorner: Point, uVector: Vector, vVector: Vector, normal: Vector, uSteps, vSteps, lightColor):
         self.llCorner = llCorner
         self.fulluVec = uVector
         self.fullvVec = vVector
         self.uSteps = uSteps
         self.vSteps = vSteps
+        self.normal = normal
 
         # 'step' vectors
         self.uVec = Vector(uVector.x / uSteps, uVector.y / uSteps, uVector.z / uSteps)
@@ -281,7 +282,7 @@ class AreaLight:
                                    self.llCorner.y + (self.uVec.y * (u + 0.5)) + (self.vVec.y * (v + 0.5)),
                                    self.llCorner.z + (self.uVec.z * (u + 0.5)) + (self.vVec.z * (v + 0.5)))
                 
-                isShadow = is_shadowed(point, cellCenter, objects)
+                isShadow = is_shadowed(point, cellCenter, objects, normal=self.normal)
                 shadowValues.append(isShadow)
 
         shadowIndex = sum(shadowValues)/len(shadowValues)
@@ -311,7 +312,7 @@ def cross(v1: Vector, v2: Vector) -> Vector:
     )
 
 # for soft shadows
-def is_shadowed(p1: Point, lightPos: Point, objects):
+def is_shadowed(p1: Point, lightPos: Point, objects, normal=Vector(0,0,0)):
     # check if a ray from p1 to lightPos is obstructed by any objects
     # used to measure light source intensity for soft shadows (1 = all light rays from source hit, 0 = none hit, hit/amount of points)
     ray = Ray(p1, point_subtract(lightPos, p1))
@@ -320,6 +321,12 @@ def is_shadowed(p1: Point, lightPos: Point, objects):
         intersection = obj.intersect(ray.origin, ray.direction)
 
         if intersection is not None and intersection.t > 0.001:
-            return 1
+            if normal.get_magnitude() > 0:
+                if dot_product(ray.direction, normal) > 0:
+                    return 1
+                else:
+                    return 0
+            else:   
+                return 1
     
     return 0

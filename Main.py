@@ -38,7 +38,7 @@ def main():
 
     lightSource2 = LightSource(Point(0, 3, 0), Vector(100, 100, 100))
 
-    areaLight = AreaLight(Point(2, 3, -3), Vector(4, 0, 2), Vector(4, 2, 0), 20, 20, Vector(200, 200, 200))
+    areaLight = AreaLight(Point(2, 3, -3), Vector(4, 0, 2), Vector(4, 2, 0), Vector(1,-2,-2), 20, 20, Vector(200, 200, 200))
     
     camera = Camera(Point(0, 0, 0), Point(0, 0, 1), Vector(0, 1, 0), 0.5, height, width, [areaLight])
     
