@@ -40,6 +40,17 @@ class Vector:
         if magnitude == 0:
             return Vector(0, 0, 0)
         return Vector(self.x / magnitude, self.y / magnitude, self.z / magnitude)
+    
+class Ray:
+    def __init__(self, origin: Point, direction: Vector):
+        self.origin = origin
+        self.direction = direction.get_normalized()
+
+    def __repr__(self):
+        return f"Ray({self.origin}, {self.direction})"
+
+    def __str__(self):
+        return f"Ray({self.origin}, {self.direction})"
 
 class IntersectOutput:
         def __init__(self, intersectPoint: Point, t, normal: Vector):
@@ -235,6 +246,48 @@ class TriMesh:
         else:
             return intersect_points
 
+class AreaLight:
+    def __init__(self, llCorner: Point, uVector: Vector, vVector: Vector, uSteps, vSteps, lightColor):
+        self.llCorner = llCorner
+        self.fulluVec = uVector
+        self.fullvVec = vVector
+        self.uSteps = uSteps
+        self.vSteps = vSteps
+
+        # 'step' vectors
+        self.uVec = Vector(uVector.x / uSteps, uVector.y / uSteps, uVector.z / uSteps)
+        self.vVec = Vector(vVector.x / vSteps, vVector.y / vSteps, vVector.z / vSteps)
+
+        self.lightColor = lightColor
+
+        # implement simple center of light source for raytracing calculations
+        halfU = vector_scalar(1/2, uVector)
+        halfV = vector_scalar(1/2, vVector)
+        centerVector = vector_add(halfU, halfV)
+
+        self.center = Point(llCorner.x + centerVector.x, llCorner.y + centerVector.y, llCorner.z + centerVector.z)
+
+    def intensityAt(self, point, objects):
+        # returns the intensity of this area light on a certain point,
+        # achieved by seeing which light 'cells' hit the point, with hit = 1 and no hit = 0
+        # average out results of hits for resulting light intensity = [0,1]
+        
+        shadowValues = []
+
+        for u in range(self.uSteps):
+            for v in range(self.vSteps):
+                # center of light source "cell"
+                cellCenter = Point(self.llCorner.x + (self.uVec.x * (u + 0.5)) + (self.vVec.x * (v + 0.5)),
+                                   self.llCorner.y + (self.uVec.y * (u + 0.5)) + (self.vVec.y * (v + 0.5)),
+                                   self.llCorner.z + (self.uVec.z * (u + 0.5)) + (self.vVec.z * (v + 0.5)))
+                
+                isShadow = is_shadowed(point, cellCenter, objects)
+                shadowValues.append(isShadow)
+
+        shadowIndex = sum(shadowValues)/len(shadowValues)
+
+        return 1 - shadowIndex
+    
 def dot_product(v1: Vector, v2: Vector):
     return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z)
 
@@ -256,3 +309,17 @@ def cross(v1: Vector, v2: Vector) -> Vector:
         v1.z * v2.x - v1.x * v2.z,
         v1.x * v2.y - v1.y * v2.x
     )
+
+# for soft shadows
+def is_shadowed(p1: Point, lightPos: Point, objects):
+    # check if a ray from p1 to lightPos is obstructed by any objects
+    # used to measure light source intensity for soft shadows (1 = all light rays from source hit, 0 = none hit, hit/amount of points)
+    ray = Ray(p1, point_subtract(lightPos, p1))
+    
+    for obj in objects: 
+        intersection = obj.intersect(ray.origin, ray.direction)
+
+        if intersection is not None and intersection.t > 0.001:
+            return 1
+    
+    return 0

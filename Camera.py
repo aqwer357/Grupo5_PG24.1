@@ -1,19 +1,8 @@
-from Elements import Point, Vector, IntersectOutput, point_subtract, cross, vector_add, vector_sub, vector_scalar, dot_product
+from Elements import Point, Vector, Ray, point_subtract, cross, vector_add, vector_sub, vector_scalar, dot_product
 from Phong import phong_model
 import math
 
 # defines camera and raycasting
-
-class Ray:
-    def __init__(self, origin: Point, direction: Vector):
-        self.origin = origin
-        self.direction = direction.get_normalized()
-
-    def __repr__(self):
-        return f"Ray({self.origin}, {self.direction})"
-
-    def __str__(self):
-        return f"Ray({self.origin}, {self.direction})"
 
 class Camera:
     def __init__(self, pos: Point, target: Point, up: Vector, dist: float, hScreen: int, wScreen: int, lightSources):
@@ -74,25 +63,21 @@ class Camera:
                             closestT = intersect.t
                             
                             for source in self.lightSources:
-                                light = point_subtract(source.point, intersect.intersectPoint).get_normalized()
+                                light = point_subtract(source.center, intersect.intersectPoint).get_normalized()
                                 normal = intersect.normal
                                 scalar = (2 * dot_product(normal, light))
 
                                 ir = Vector(0,0,0)
-                                for source in self.lightSources:
-                                    light = point_subtract(source.point, intersect.intersectPoint).get_normalized()
-                                    normal = intersect.normal
-                                    scalar = (2 * dot_product(normal, light))
 
-                                    if obj.k_reflection.get_magnitude() > 0:
-                                        reflect = Vector((scalar*normal.x - light.x), (scalar*normal.y - light.y), (scalar*normal.z - light.z)).get_normalized()
-                                        reflectRay = Ray(intersect.intersectPoint, reflect)
+                                if obj.k_reflection.get_magnitude() > 0:
+                                    reflect = Vector((scalar*normal.x - light.x), (scalar*normal.y - light.y), (scalar*normal.z - light.z)).get_normalized()
+                                    reflectRay = Ray(intersect.intersectPoint, reflect)
 
-                                        reflectColor = self.raytrace(reflectRay, objects, recursionAmt+1, inIOR)
-                                        
-                                        ir = Vector(reflectColor.x + ir.x, reflectColor.y + ir.y, reflectColor.z + ir.z)
+                                    reflectColor = self.raytrace(reflectRay, objects, recursionAmt+1, inIOR)
+                                    
+                                    ir = Vector(reflectColor.x + ir.x, reflectColor.y + ir.y, reflectColor.z + ir.z)
                                 
-                                color = phong_model(ray.origin, intersect.intersectPoint, self.lightSources, intersect.normal,
+                                color = phong_model(objects, ray.origin, intersect.intersectPoint, self.lightSources, intersect.normal,
                                                     obj.k_ambient, obj.k_diffuse, obj.k_specular, obj.k_reflection, obj.k_transmission, obj.n_coef, ir)
                                         
                 elif intersection.t < closestT:
@@ -101,7 +86,7 @@ class Camera:
                     ir = Vector(0,0,0)
                     it = Vector(0,0,0)
                     for source in self.lightSources:
-                        light = point_subtract(source.point, intersection.intersectPoint).get_normalized()
+                        light = point_subtract(source.center, intersection.intersectPoint).get_normalized()
                         normal = intersection.normal
                         scalar = (2 * dot_product(normal, light))
 
@@ -136,8 +121,8 @@ class Camera:
                         transRay = Ray(intersection.intersectPoint, refract)
 
                         it = self.raytrace(transRay, objects, recursionAmt+1, outIOR)
-
-                    color = phong_model(ray.origin, intersection.intersectPoint, self.lightSources, intersection.normal,
+                        
+                    color = phong_model(objects, ray.origin, intersection.intersectPoint, self.lightSources, intersection.normal,
                                         obj.k_ambient, obj.k_diffuse, obj.k_specular, obj.k_reflection, obj.k_transmission, obj.n_coef, ir, it)
             
         return color

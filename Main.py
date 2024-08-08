@@ -1,4 +1,4 @@
-from Elements import Point, Vector, Sphere, Plane, TriMesh, cross, point_subtract
+from Elements import Point, Vector, Sphere, Plane, TriMesh, AreaLight, cross, point_subtract
 from Camera import Camera
 from Transforms import affine_transform
 from Phong import LightSource
@@ -34,11 +34,13 @@ def main():
     n4 = cross(point_subtract(p0, p3), point_subtract(p4, p3))
     n4 = n4.get_normalized()
 
-    lightSource1 = LightSource(Point(0, 1, 0), Vector(200, 200, 200))
+    lightSource1 = LightSource(Point(0, 3, 6), Vector(200, 200, 200))
 
     lightSource2 = LightSource(Point(0, 3, 0), Vector(100, 100, 100))
 
-    camera = Camera(Point(0, 0, 0), Point(0, 0, 1), Vector(0, 1, 0), 0.5, height, width, [lightSource1])
+    areaLight = AreaLight(Point(2, 3, -3), Vector(4, 0, 2), Vector(4, 2, 0), 20, 20, Vector(200, 200, 200))
+    
+    camera = Camera(Point(0, 0, 0), Point(0, 0, 1), Vector(0, 1, 0), 0.5, height, width, [areaLight])
     
     reddishK = Vector(0.2, 0, 0.1)
     greenishK = Vector(0, 0.2, 0)
@@ -54,9 +56,9 @@ def main():
     diffuseK = Vector (0.3, 0.3, 0.3)
 
     sphere = Sphere(Point(0, 0, 6), 2, Vector(0, 0, 0), Vector(0, 0, 0),  Vector(0.1, 0.1, 0.1), Vector(0.0, 0.0, 0.0), Vector(1, 1, 1), 1.5, 100)
-    plane = Plane(Point(0, -3, -10), Vector(0, 1, 0), greenishK, colB, specularK, Vector(0, 0, 0), Vector(0, 0, 0), 1, 10)
+    plane = Plane(Point(0, -1, -10), Vector(0, 1, 0), greenishK, greenishK, specularK, Vector(0, 0, 0), Vector(0, 0, 0), 1, 10)
 
-    sphere2 = Sphere(Point(0, 3, 20), 2, blueishK, colC, specularK, Vector(0, 0, 0), Vector(0, 0, 0), 1, 100)
+    sphere2 = Sphere(Point(0, 1, 5), 2, blueishK, colC, specularK, Vector(0, 0, 0), Vector(0, 0, 0), 1, 100)
 
     mesh = TriMesh(2, 
                    4, 
@@ -75,7 +77,7 @@ def main():
 
     objects = []
 
-    objects.append(sphere)
+    #objects.append(sphere)
     objects.append(sphere2)
     #objects.append(mesh)
     objects.append(plane)

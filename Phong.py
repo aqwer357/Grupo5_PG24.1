@@ -1,12 +1,15 @@
-from Elements import Point, Vector, point_subtract, dot_product
+from Elements import Point, Vector, point_subtract, dot_product, vector_scalar, is_shadowed
 
 class LightSource:
-    def __init__(self, point: Point, lightColor: Vector):
-        self.point = point
+    def __init__(self, center: Point, lightColor: Vector):
+        self.center = center
         self.lightColor = lightColor
 
+    def intensityAt(self, point, objects):
+        return 1 - is_shadowed(point, self.center, objects)
 
-def phong_model(viewPos: Point, intersectPoint: Point, lightSources, normal: Vector, ka: Vector, kd: Vector, ks: Vector, kr: Vector, kt: Vector, n, ir=Vector(0,0,0), it=Vector(0,0,0)):
+
+def phong_model(objects, viewPos: Point, intersectPoint: Point, lightSources, normal: Vector, ka: Vector, kd: Vector, ks: Vector, kr: Vector, kt: Vector, n, ir=Vector(0,0,0), it=Vector(0,0,0)):
     
     view = point_subtract(viewPos, intersectPoint).get_normalized()
 
@@ -20,10 +23,13 @@ def phong_model(viewPos: Point, intersectPoint: Point, lightSources, normal: Vec
 
     colorResult = Vector(ka.x * ia.x, ka.y * ia.y, ka.z * ia.z)
     for source in lightSources:
-        light = point_subtract(source.point,intersectPoint).get_normalized()
+        lightIntensity = source.intensityAt(intersectPoint, objects)
+
+        light = point_subtract(source.center,intersectPoint).get_normalized()
         scalar = (2 * dot_product(normal, light))
         reflect = Vector((scalar*normal.x - light.x), (scalar*normal.y - light.y), (scalar*normal.z - light.z)).get_normalized()
         il = source.lightColor
+        il = vector_scalar(lightIntensity, source.lightColor)
 
         r = (il.x * (kd.x * (dot_product(normal,light)) + ks.x * (dot_product(reflect,view))**n)) + kr.x * ir.x + kt.x * it.x
         g = (il.y * (kd.y * (dot_product(normal,light)) + ks.y * (dot_product(reflect,view))**n)) + kr.y * ir.y + kt.y * it.y
