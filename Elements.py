@@ -48,7 +48,7 @@ class IntersectOutput:
             self.normal = normal
 
 class Sphere:
-    def __init__(self, center: Point, radius: float, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, n_coef):
+    def __init__(self, center: Point, radius: float, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, refractIndex, n_coef):
         self.center = center
         self.radius = radius
         self.k_ambient = k_ambient
@@ -56,6 +56,7 @@ class Sphere:
         self.k_specular = k_specular
         self.k_reflection = k_reflection
         self.k_transmission = k_transmission
+        self.refractIndex = refractIndex
         self.n_coef = n_coef
 
     def __repr__(self):
@@ -74,7 +75,7 @@ class Sphere:
         else:
             # we choose negative in quadratic formula to choose the first point of intersection with the sphere
             t = (-b - discriminant**0.5) / (2.0 * a)
-            if t >= 0:
+            if t > 0.0001:
                 intersect_point = Point(origin.x + t * direction.x,
                                         origin.y + t * direction.y,
                                         origin.z + t * direction.z)
@@ -86,12 +87,24 @@ class Sphere:
                                                    normal)
                 return intersect_output
             else:
-                # t <= 0 --> object is behind camera
-                return None
+                t = (-b + discriminant**0.5) / (2.0 * a)
+                if t > 0.0001:
+                    intersect_point = Point(origin.x + t * direction.x,
+                                            origin.y + t * direction.y,
+                                            origin.z + t * direction.z)
+
+                    normal = point_subtract(intersect_point, self.center)
+
+                    intersect_output = IntersectOutput(intersect_point,
+                                                    t,
+                                                    normal)
+                    return intersect_output
+                else:
+                    return None
 
 
 class Plane:
-    def __init__(self, point: Point, normal: Vector, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, n_coef):
+    def __init__(self, point: Point, normal: Vector, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, refractIndex, n_coef):
         self.point = point
         self.normal = normal
         self.k_ambient = k_ambient
@@ -99,6 +112,7 @@ class Plane:
         self.k_specular = k_specular
         self.k_reflection = k_reflection
         self.k_transmission = k_transmission
+        self.refractIndex = refractIndex
         self.n_coef = n_coef
 
     def __repr__(self):
@@ -110,7 +124,7 @@ class Plane:
         if denom != 0:
             diff = point_subtract(self.point, origin)
             t = (diff.x * self.normal.x + diff.y * self.normal.y + diff.z * self.normal.z) / denom
-            if t >= 0:
+            if t > 0.001:
                 intersect_point = Point(origin.x + t * direction.x,
                                         origin.y + t * direction.y,
                                         origin.z + t * direction.z)
@@ -122,7 +136,7 @@ class Plane:
         return None
     
 class TriMesh:
-    def __init__(self, triangleAmt, vertexAmt, vertexList, triangleList, triangleNormals, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, n_coef):
+    def __init__(self, triangleAmt, vertexAmt, vertexList, triangleList, triangleNormals, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, refractIndex, n_coef):
         self.triangleAmt = triangleAmt
         self.vertexAmt = vertexAmt
         self.vertexList = vertexList
@@ -150,6 +164,7 @@ class TriMesh:
         self.k_specular = k_specular
         self.k_reflection = k_reflection
         self.k_transmission = k_transmission
+        self.refractIndex = refractIndex
         self.n_coef = n_coef
 
     def intersectTriangle(self, origin: Point, direction: Vector, triangleIndex):
@@ -165,7 +180,7 @@ class TriMesh:
             t = dot_product(diff, self.triangleNormals[triangleIndex]) / denom
             
             # if intersects with plane, check for triangle
-            if t >= 0:
+            if t > 0.001:
                 intersectPlanePoint = Point(origin.x + t * direction.x,
                                             origin.y + t * direction.y,
                                             origin.z + t * direction.z)

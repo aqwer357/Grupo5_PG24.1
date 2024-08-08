@@ -6,7 +6,7 @@ class LightSource:
         self.lightColor = lightColor
 
 
-def phong_model(viewPos: Point, intersectPoint: Point, lightSources, normal: Vector, ka: Vector, kd: Vector, ks: Vector, kr: Vector, kt: Vector, n):
+def phong_model(viewPos: Point, intersectPoint: Point, lightSources, normal: Vector, ka: Vector, kd: Vector, ks: Vector, kr: Vector, kt: Vector, n, ir=Vector(0,0,0), it=Vector(0,0,0)):
     
     view = point_subtract(viewPos, intersectPoint).get_normalized()
 
@@ -25,9 +25,9 @@ def phong_model(viewPos: Point, intersectPoint: Point, lightSources, normal: Vec
         reflect = Vector((scalar*normal.x - light.x), (scalar*normal.y - light.y), (scalar*normal.z - light.z)).get_normalized()
         il = source.lightColor
 
-        r = (il.x * (kd.x * (dot_product(normal,light)) + ks.x * (dot_product(reflect,view))**n))
-        g = (il.y * (kd.y * (dot_product(normal,light)) + ks.y * (dot_product(reflect,view))**n))
-        b = (il.y * (kd.z * (dot_product(normal,light)) + ks.z * (dot_product(reflect,view))**n))
+        r = (il.x * (kd.x * (dot_product(normal,light)) + ks.x * (dot_product(reflect,view))**n)) + kr.x * ir.x + kt.x * it.x
+        g = (il.y * (kd.y * (dot_product(normal,light)) + ks.y * (dot_product(reflect,view))**n)) + kr.y * ir.y + kt.y * it.y
+        b = (il.y * (kd.z * (dot_product(normal,light)) + ks.z * (dot_product(reflect,view))**n)) + kr.z * ir.z + kt.z * it.z
 
         colorResult.x += r
         colorResult.y += g
