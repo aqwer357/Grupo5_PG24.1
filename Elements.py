@@ -19,6 +19,9 @@ class Point:
     def __str__(self):
         return f"({self.x}, {self.y}, {self.z})"
 
+    def __getitem__(self, index):
+        return (self.x, self.y, self.z)[index]
+
 
 class Vector:
     def __init__(self, x, y, z):
@@ -31,6 +34,9 @@ class Vector:
 
     def __str__(self):
         return f"({self.x}, {self.y}, {self.z})"
+
+    def __getitem__(self, index):
+        return (self.x, self.y, self.z)[index]
 
     def get_magnitude(self):
         return (self.x**2 + self.y**2 + self.z**2)**0.5
@@ -62,6 +68,9 @@ class Sphere:
 
     def __repr__(self):
         return f"Sphere({self.center}, {self.radius})"
+
+    def get_center(self):
+        return self.center
 
     def intersect(self, origin: Point, direction: Vector):
         oc = point_subtract(origin, self.center)
@@ -102,6 +111,10 @@ class Plane:
     def __repr__(self):
         return f"Plane({self.point}, {self.normal})"
 
+    def get_center(self):
+        # Para um plano, podemos considerar o ponto base como o "centro"
+        return self.point
+
     def intersect(self, origin: Point, direction: Vector):
         denom = dot_product(self.normal, direction)
         if denom != 0:
@@ -111,13 +124,14 @@ class Plane:
                 intersect_point = Point(origin.x + t * direction.x, origin.y + t * direction.y, origin.z + t * direction.z)
                 return IntersectOutput(intersect_point, t, self.normal, self)
         return None
+
     
 class TriMesh:
     def __init__(self, triangleAmt, vertexAmt, vertexList, triangleList, triangleNormals, k_ambient: Vector, k_diffuse: Vector, k_specular: Vector, k_reflection: Vector, k_transmission: Vector, refractIndex, n_coef):
         self.triangleAmt = triangleAmt
         self.vertexAmt = vertexAmt
         self.vertexList = vertexList
-        self.triangleList = triangleList # Organized by index
+        self.triangleList = triangleList  # Organized by index
         self.triangleNormals = triangleNormals
 
         self.vertexNormals = []
@@ -143,6 +157,12 @@ class TriMesh:
         self.k_transmission = k_transmission
         self.refractIndex = refractIndex
         self.n_coef = n_coef
+
+    def get_center(self):
+        x = sum(vertex.x for vertex in self.vertexList) / self.vertexAmt
+        y = sum(vertex.y for vertex in self.vertexList) / self.vertexAmt
+        z = sum(vertex.z for vertex in self.vertexList) / self.vertexAmt
+        return Point(x, y, z)
 
     def intersectTriangle(self, origin: Point, direction: Vector, triangleIndex):
         denom = dot_product(self.triangleNormals[triangleIndex], direction)
@@ -191,26 +211,24 @@ class TriMesh:
                         if self.vertexList[vertIndex] == intersect_point:
                             normal = self.vertexNormals[vertIndex]
 
-
-                    intersect_output = IntersectOutput(intersect_point,
-                                                       t,
-                                                       normal)
+                    intersect_output = IntersectOutput(intersect_point, t, normal, self)
                     return intersect_output
                 else:
                     return None
         return None
     
     def intersect(self, origin: Point, direction: Vector):
-        intersect_points = []
+        closest_intersection = None
+        min_t = float('inf')
+        
         for triangleIndex in range(self.triangleAmt):
             intersection = self.intersectTriangle(origin, direction, triangleIndex)
-            if intersection is not None:
-                intersect_points.append(intersection)
+            if intersection is not None and intersection.t < min_t:
+                closest_intersection = intersection
+                min_t = intersection.t
 
-        if len(intersect_points) == 0:
-            return None
-        else:
-            return intersect_points
+        return closest_intersection
+
 
 def dot_product(v1: Vector, v2: Vector):
     return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z)
